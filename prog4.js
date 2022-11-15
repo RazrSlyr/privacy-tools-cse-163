@@ -244,6 +244,7 @@ async function drawChart() {
 function toggleLine(event) {
     let target = d3.select(event.target);
     // Check if line needs to be turned on or off
+    console.log("box toggled");
     if (!target.property("checked")) {
         d3.select(`.line.${target.attr("class")}`).style("stroke-width", 0);
         d3.select(`text.${target.attr("class")}`).style("font", "0em Roboto");
