@@ -110,26 +110,27 @@ function drawLines(svg, data, countries, xScale, yScale) {
 
 
     // Grabs each path that was made
-    // country.select("path")
-    //     .each(function () {
-    //         // for every path, animate it
-    //         // the code for this loop is similar to the code used in this project: 
-    //         // https://sureshlodha.github.io/CMPS263_Winter2018/CMPS263FinalProjects/PrescriptionDrugs/index.html
-    //         d3.select(this)
-    //             .attr("stroke-dasharray", this.getTotalLength() + "," + this.getTotalLength())
-    //             .attr("stroke-dashoffset", "" + this.getTotalLength())
-    //             .transition()
-    //             .duration(2000)
-    //             .ease(d3.easeLinear)
-    //             .attr("stroke-dashoffset", 0);
+    country.select("path")
+        .each(function () {
+            // for every path, animate it
+            // the code for this loop is similar to the code used in this project: 
+            // https://sureshlodha.github.io/CMPS263_Winter2018/CMPS263FinalProjects/PrescriptionDrugs/index.html
+            d3.select(this)
+                .attr("stroke-dasharray", this.getTotalLength() + "," + this.getTotalLength())
+                .attr("stroke-dashoffset", "" + this.getTotalLength())
+                .transition()
+                .duration(2000)
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 0);
 
-    //     });
+        });
 
     // adds text to the end of every path
     // this is, in part, taken from https://bl.ocks.org/mbostock/3884955
     country.append("text")
         // sets starting point of text
         .attr("y", (d) => yScale(d.values[0].energy))
+        .attr("class", (d) => d.id)
         .style("font", "1em Roboto")
         // adds a transition effect to better line up with the line animation
         .transition()
@@ -240,4 +241,19 @@ async function drawChart() {
 
 }
 
+function toggleLine(event) {
+    let target = d3.select(event.target);
+    // Check if line needs to be turned on or off
+    if (!target.property("checked")) {
+        d3.select(`.line.${target.attr("class")}`).style("stroke-width", 0);
+        d3.select(`text.${target.attr("class")}`).style("font", "0em Roboto");
+    } else {
+        d3.select(`.line.${target.attr("class")}`).style("stroke-width", 1);
+        d3.select(`text.${target.attr("class")}`).style("font", "1em Roboto");
+    }
+}
+
+d3.selectAll("input")
+    .property("checked", true)
+    .on("click", toggleLine);
 drawChart();
