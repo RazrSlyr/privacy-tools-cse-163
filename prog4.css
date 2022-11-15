@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+.line {
+    fill: none;
+}
+
+.title {
+    font-family: 'Roboto', sans-serif;
+}
+
+.chart.title {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.axis.title {
+    font-style: italic;
+    font-size: 1em;
+}
+
+/* CSS for Grid taken from here: https://bl.ocks.org/d3noob/c506ac45617cf9ed39337f99f8511218 */
+
+
+/* Each tick in an access uses a line, so this is to customize the ticks */
+.grid line {
+    stroke: lightgrey;
+    /* sets color to a slight grey */
+    stroke-opacity: 0.7;
+    /* makes line slightly transparent */
+    shape-rendering: crispEdges;
+    /* emphasize contrast, make lines clear */
+}
+
+/* By setting the path width to 0, we are basically turning off the axis line */
+/* This is good since we only use the ticks when creating the grid */
+.grid path {
+    stroke-width: 0;
+}
