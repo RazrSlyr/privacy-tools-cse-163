@@ -6,7 +6,7 @@
     <!-- Tailwind is a CSS Tool that I personally like to use -->
     <!-- Read up on it here if you'd like: https://tailwindcss.com/ -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" type="text/css" href="./prog4.css">
+    <link rel="stylesheet" type="text/css" href="./style.css">
 </head>
 
 <body>
@@ -19,22 +19,20 @@
 
             </svg>
             <div>
-                <input type="checkbox" class="TOR">
-                <label>TOR</label><br>
-                <input type="checkbox" class="DuckDuckGo">
+                <button class="w-5 h-5 rounded-full transition-colors duration-300 Tor" active="True"></button>
+                <label>Tor</label><br>
+                <button class="w-5 h-5 rounded-full transition-colors duration-300 DuckDuckGo" active="True"></button>
                 <label>DuckDuckGo</label><br>
-                <input type="checkbox" class="Brave">
-                <label>Brave</label><br>
-                <input type="checkbox" class="Fortinet">
-                <label>Fortinet</label><br>
-                <input type="checkbox" class="NortonLifeLock">
-                <label>NortonLifeLock</label><br>
-                <input type="checkbox" class="Startpage">
-                <label>Starpage</label><br>
+                <button class="w-5 h-5 rounded-full transition-colors duration-300 Brave" active="True"></button>
+                <label>Brave Browser</label><br>
+                <button class="w-5 h-5 rounded-full transition-colors duration-300 VPN" active="True"></button>
+                <label>VPN</label><br>
+                <button class="w-5 h-5 rounded-full transition-colors duration-300 Startpage" active="True"></button>
+                <label>Startpage</label><br>
             </div>
         </div>
     </div>
-    <div class="w-full bg-blue-100 p-5 text-center">
+    <div class="w-full bg-blue-100 p-10 text-center">
         <b>Created By</b><br>
         <span>Ben Grant</span><br>
         <span>Brandon Lovelady</span><br>
@@ -56,19 +54,19 @@
             <div>
                 <b><span>Visualization sources</span></b>
                 <ul>
-                    <li>Example</li>
+                    <li><a class="text-blue-600" href="https://www.oberlo.com/statistics/search-engine-market-share">Market Share Comparison (Bar Chart)</a></li>
                 </ul>
             </div>
             <div>
                 <b><span>Code Sources</span></b>
                 <ul>
-                    <li>Example</li>
+                    <li><a class="text-blue-600" href="https://bl.ocks.org/larsenmtl/e3b8b7c2ca4787f77d78f58d41c3da91">Mouse Over Multiline Code</a></li>
                 </ul>
             </div>
 
         </div>
     </div>
-    <script src="./prog4.js"></script>
+    <script src="./code.js"></script>
 </body>
 
 </html>

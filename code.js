@@ -25,8 +25,7 @@ function createSvg(w, h, margin) {
 function drawAxes(svg, xScale, yScale, h) {
     // Creates xAxis
     let xAxis = d3.axisBottom()
-        .scale(xScale)
-        .tickFormat(d3.format("")); // Removes commas from formatting 
+        .scale(xScale);
     // Creates yAxis
     let yAxis = d3.axisLeft()
         .scale(yScale);
@@ -51,45 +50,47 @@ function drawAxes(svg, xScale, yScale, h) {
 
 // Converts all the strings in the data to numbers
 function convertData(d, i, columns) {
-    for (let j = 0; j < columns.length; j++) {
+    for (let j = 1; j < columns.length; j++) {
         d[columns[j]] = +d[columns[j]]; // This converts all the columns back to numbers
     }
+    d.time = d3.timeParse("%Y-%m-%d")(d.Month);
     return d;
 }
 
 // Takes in coverted data, returns structure
 // where each country has its own array of years 
 // and energy consumptions
-function getCountries(data) {
-    let countryNames = data.columns.slice(1); // Slice cuts off the Year category
-    let countries = countryNames.map((id) => {
+function getApps(data) {
+    
+    let appNames = data.columns.slice(1); // Slice cuts off the Year category
+    let apps = appNames.map((id) => {
         return {
             id: id, // This stores the name of the country
             values: data.map((d) => {
-                return { year: d.year, energy: d[id] }
+                return { time: d.time, stat: d[id] }
             })
             // The code above maps every data point to an object containing
             // the year of that data point and the energy consumption for that country
             // in that data point
         }
     });
-    return countries;
+    return apps;
 }
 
 // Given the country data, draws all the lines
-function drawLines(svg, data, countries, xScale, yScale) {
-    let countryNames = data.columns.slice(1); // Slice cuts off the Year category
-    // Creates a "scale" that maps the country names to different colors
+function drawLines(svg, data, apps, xScale, yScale) {
+    let appNames = data.columns.slice(1); // Slice cuts off the time category
+    // Creates a "scale" that maps the app names to different colors
     let colorScale = d3.scaleOrdinal()
-        .domain(countryNames)
+        .domain(appNames)
         .range(d3.schemeCategory10);
 
-    // let's make a group with a class "country countryName" for every country 
-    let country = svg.selectAll(".country")
-        .data(countries)
+    // let's make a group with a class "app appName" for every country 
+    let app = svg.selectAll(".app")
+        .data(apps)
         .enter()
         .append("g")
-        .attr("class", (d) => "country " + d.id);
+        .attr("class", (d) => "app " + d.id);
     // Note: adding these classes does nothing for functionality
     // It helps readability, however
 
@@ -98,52 +99,28 @@ function drawLines(svg, data, countries, xScale, yScale) {
     // d3.line
     let line = d3.line()
         .curve(d3.curveBasis) // curves the line
-        .x((d) => xScale(d.year)) // This sets the x to the year but properly scaled
-        .y((d) => yScale(d.energy)) // This sets the y to the energy level but properly scalled
+        .x((d) => xScale(d.time)) // This sets the x to the time but properly scaled
+        .y((d) => yScale(d.stat)) // This sets the y to the stat being measured but properly scaled
 
     // using this line, we can add the paths for each country
-    country.append("path")
+    app.append("path")
         .attr("class", (d) => "line " + d.id) // unlike other classes, this one actually has attributes. it removes the fill
         .attr("d", (d) => line(d.values)) // sets the x and y using the line function
         .style("stroke", (d) => colorScale(d.id)) // uses the colorScale to give each country its own color
         .style("stroke-width", 1);
 
-
-    // Grabs each path that was made
-    country.select("path")
-        .each(function () {
-            // for every path, animate it
-            // the code for this loop is similar to the code used in this project: 
-            // https://sureshlodha.github.io/CMPS263_Winter2018/CMPS263FinalProjects/PrescriptionDrugs/index.html
-            d3.select(this)
-                .attr("stroke-dasharray", this.getTotalLength() + "," + this.getTotalLength())
-                .attr("stroke-dashoffset", "" + this.getTotalLength())
-                .transition()
-                .duration(2000)
-                .ease(d3.easeLinear)
-                .attr("stroke-dashoffset", 0);
-
-        });
-
     // adds text to the end of every path
     // this is, in part, taken from https://bl.ocks.org/mbostock/3884955
-    country.append("text")
-        // sets starting point of text
-        .attr("y", (d) => yScale(d.values[0].energy))
-        .attr("class", (d) => d.id)
-        .style("font", "1em Roboto")
-        // adds a transition effect to better line up with the line animation
-        .transition()
-        .duration(2500)
-        // moves text to end point
-        .attr("transform", (d) => {
-            return "translate(" + xScale(d.values[d.values.length - 1].year) +
-                "," + (yScale(d.values[d.values.length - 1].energy) - yScale(d.values[0].energy)) + ")";
-        })
-        .attr("x", 3)
-        .attr("dy", "0.35em")
-        .attr("fill", (d) => colorScale(d.id))
-        .text((d) => { return d.id; });
+    // app.append("text")
+    //     // set position of text
+    //     .attr("y", (d) => yScale(d.values[d.values.length - 1].stat))
+    //     .attr("x", (d) => xScale(d.values[d.values.length - 1].time))
+    //     .attr("class", (d) => d.id)
+    //     .style("font", "1em Roboto")
+    //     .attr("dx", "0.1em")
+    //     .attr("dy", "0.35em")
+    //     .attr("fill", (d) => colorScale(d.id))
+    //     .text((d) => { return d.id; });
 
 
 
@@ -156,7 +133,7 @@ function drawTitles(svg, w, h) {
         .attr("class", "chart title")
         .attr("x", (w - margin.left - margin.right) / 2) // positions at the middle top
         .attr("y", 0)
-        .text("Annual Downloads of Various Privacy Tools")
+        .text("Google Trends for Various Privacy Tools")
         .attr("text-anchor", "middle"); // centers text 
 
     // adds x-axis title
@@ -171,7 +148,7 @@ function drawTitles(svg, w, h) {
     // adds the y-axis title
     svg.append("text")
         .attr("class", "axis title")
-        .text("Downloads Per Year")
+        .text("Google Trends Results")
         .attr("text-anchor", "middle") // centers text
         .attr("transform", "rotate(-90), translate(-" + h / 2 + ", -50)"); // positions on the left, rotated so the text is vertical
 
@@ -205,27 +182,42 @@ function drawGrid(svg, xScale, yScale, w, h) {
 
 }
 
+let colorScale;
+
 // Combines all the helper functions to draw the completed chart
 async function drawChart() {
-    const data = await d3.csv("./BRICSdata.csv", convertData);
-    const countries = getCountries(data);
-
+    const data = await d3.csv("./awareness.csv", convertData);
+    const apps = getApps(data);
     let svg = createSvg(w, h, margin);
     console.log(data);
-    console.log(countries);
+    console.log(apps);
+
+    // define color scale
+    let appNames = data.columns.slice(1);
+    colorScale = d3.scaleOrdinal()
+        .domain(appNames)
+        .range(d3.schemeCategory10);
+
+    // Color all the buttons
+    for (let i = 0; i < apps.length; i++) {
+        console.log(`button.${apps[i].id.split(" ").join("")}`);
+        d3.select(`button.${apps[i].id.split(" ").join("")}`).style("background-color", colorScale(apps[i].id));
+        d3.select(`button.${apps[i].id.split(" ").join("")}`).style("border", `2px solid ${colorScale(apps[i].id)}`);
+    }
 
     // // Get's the lowest and highest year. Will be used for xScale
-    let xExtents = d3.extent(data, (d) => d.year);
+    let xExtents = d3.extent(data, (d) => d.time);
 
     // // Get's the lowest and highest energy consumption. Will be used for yScale
     // // This is done through two layers of iteration, first getting the min/max
-    // // of each country then getting the min/max of all the mins and maxes
-    let yMin = d3.min(countries, (c) => d3.min(c.values, (d) => d.energy));
-    let yMax = d3.max(countries, (c) => d3.max(c.values, (d) => d.energy));
+    // // of each app then getting the min/max of all the mins and maxes
+    let yMin = d3.min(apps, (c) => d3.min(c.values, (d) => d.stat));
+    let yMax = d3.max(apps, (c) => d3.max(c.values, (d) => d.stat));
     console.log(yMin);
     console.log(yMax);
 
-    let xScale = d3.scaleLinear()
+
+    let xScale = d3.scaleTime()
         .domain(xExtents)
         .range([0, w - margin.left - margin.right]);
 
@@ -237,24 +229,41 @@ async function drawChart() {
     drawAxes(svg, xScale, yScale, h);
     drawTitles(svg, w, h);  
 
-    drawLines(svg, data, countries, xScale, yScale);
+    drawLines(svg, data, apps, xScale, yScale);
 
 }
 
 function toggleLine(event) {
     let target = d3.select(event.target);
+    let classes = target.attr("class").split(" ");
+    let appName = classes[classes.length - 1];
+    console.log(appName);
     // Check if line needs to be turned on or off
     console.log("box toggled");
-    if (!target.property("checked")) {
-        d3.select(`.line.${target.attr("class")}`).style("stroke-width", 0);
-        d3.select(`text.${target.attr("class")}`).style("font", "0em Roboto");
+    if (target.attr("active") == "True") {
+        target.attr("active", "False"); 
+        d3.select(`.line.${appName}`).style("stroke-width", 0);
+        target.style("background-color", "white");
+        target.style("border", `2px solid ${colorScale(appName)}`);
     } else {
-        d3.select(`.line.${target.attr("class")}`).style("stroke-width", 1);
-        d3.select(`text.${target.attr("class")}`).style("font", "1em Roboto");
+        target.attr("active", "True"); 
+        d3.select(`.line.${appName}`).style("stroke-width", 1);
+        target.style("background-color", colorScale(appName));
+        
+        target.style("border", "2px solid white");
     }
+
+
+    // if (!target.property("checked")) {
+    //     d3.select(`.line.${target.attr("class")}`).style("stroke-width", 0);
+    //     target.style("background-color", "green");
+    //     // d3.select(`text.${target.attr("class")}`).style("font", "0em Roboto");
+    // } else {
+    //     d3.select(`.line.${target.attr("class")}`).style("stroke-width", 1);
+    //     // d3.select(`text.${target.attr("class")}`).style("font", "1em Roboto");
+    // }
 }
 
-d3.selectAll("input")
-    .property("checked", true)
+d3.selectAll("button")
     .on("click", toggleLine);
 drawChart();
