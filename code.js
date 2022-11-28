@@ -48,19 +48,23 @@ function drawAxes(svg, xScale, yScale, h) {
 
 }
 
-// Converts all the strings in the data to numbers
-function convertData(d, i, columns) {
+// Converts all the strings in the data to numbers, when date is in YYYY-MM format
+function convertDataWithMonth(d, i, columns) {
+    // iterate starting at 1 to ignore the time column
     for (let j = 1; j < columns.length; j++) {
-        d[columns[j]] = +d[columns[j]]; // This converts all the columns back to numbers
+        // google trends data contains "<1" entries
+        d[columns[j]] = d[columns[j]] == "<1"
+            ? 0
+            : parseFloat(d[columns[j]]); // This converts all the columns back to numbers
     }
-    d.time = d3.timeParse("%Y-%m-%d")(d.Month);
+    d.time = d3.timeParse("%Y-%m")(d.Month);
     return d;
 }
 
-// Converts all the strings in the data to numbers
-function convertDataSM(d, i, columns) {
+// Converts all the strings in the data to numbers, when date is in YYYY format
+function convertDataWithYear(d, i, columns) {
     for (let j = 1; j < columns.length; j++) {
-        d[columns[j]] = +d[columns[j]]; // This converts all the columns back to numbers
+        d[columns[j]] = parseFloat(d[columns[j]]); // This converts all the columns back to numbers
     }
     d.time = d3.timeParse("%Y")(d.Year);
     return d;
@@ -204,6 +208,7 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     colorScale.domain(appNames).range(d3.schemeCategory10);
 
     // Color all the buttons
+    // TODO (ben) possibly have d3 generate these buttons?
     for (let i = 0; i < apps.length; i++) {
         console.log(`button.${apps[i].id.split(" ").join("")}`);
         d3.select(`button.${apps[i].id.split(" ").join("")}`).style("background-color", colorScale(apps[i].id));
@@ -274,10 +279,10 @@ function toggleLine(event, colorScale) {
 
 
 let awarness_chart = createSvg(h, margin, "awareness");
-drawChart("./awareness.csv", awarness_chart, convertData, "Year", "Google Trends Results", "Google Trends for Various Privacy Tools", colorScaleApps);
+drawChart("./awareness.csv", awarness_chart, convertDataWithMonth, "Year", "Google Trends Results", "Google Trends for Various Privacy Tools", colorScaleApps);
 let social_media_chart = createSvg(h, margin, "socialmedia")
 
-drawChart("./sm_monthly_users.csv", social_media_chart, convertDataSM, "Year", "Monthly Users (in Millions)", "Monthly Social Media Users", colorScaleSM);
+drawChart("./sm_monthly_users.csv", social_media_chart, convertDataWithYear, "Year", "Monthly Users (in Millions)", "Monthly Social Media Users", colorScaleSM);
 
 d3.selectAll("button.app")
     .on("click", (e) => {
