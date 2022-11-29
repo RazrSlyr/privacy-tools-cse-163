@@ -256,13 +256,10 @@ function toggleLine(event, colorScale) {
         target.attr("active", "False");
         d3.select(`.line.${appName}`).style("stroke-width", 0);
         target.style("background-color", "white");
-        target.style("border", `2px solid ${colorScale(appName)}`);
     } else {
         target.attr("active", "True");
         d3.select(`.line.${appName}`).style("stroke-width", 1);
         target.style("background-color", colorScale(appName));
-
-        target.style("border", "2px solid white");
     }
 
 
