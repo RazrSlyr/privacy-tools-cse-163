@@ -124,16 +124,16 @@ function drawLines(svg, data, apps, xScale, yScale) {
 
     // adds text to the end of every path
     // this is, in part, taken from https://bl.ocks.org/mbostock/3884955
-    app.append("text")
-        // set position of text
-        .attr("y", (d) => yScale(d.values[d.values.length - 1].stat))
-        .attr("x", (d) => xScale(d.values[d.values.length - 1].time))
-        .attr("class", (d) => d.id)
-        .style("font", "1em Roboto")
-        .attr("dx", "0.1em")
-        .attr("dy", "0.35em")
-        .attr("fill", (d) => colorScale(d.id))
-        .text((d) => { return d.id; });
+    // app.append("text")
+    //     // set position of text
+    //     .attr("y", (d) => yScale(d.values[d.values.length - 1].stat))
+    //     .attr("x", (d) => xScale(d.values[d.values.length - 1].time))
+    //     .attr("class", (d) => d.id)
+    //     .style("font", "1em Roboto")
+    //     .attr("dx", "0.1em")
+    //     .attr("dy", "0.35em")
+    //     .attr("fill", (d) => colorScale(d.id))
+    //     .text((d) => { return d.id; });
 
 
 
