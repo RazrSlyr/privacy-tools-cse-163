@@ -195,6 +195,19 @@ function drawGrid(svg, xScale, yScale, w, h) {
 
 }
 
+function drawEventLines(svg, xScale, height) {
+    svg.selectAll(".event")
+        .data(eventsData)
+        .enter()
+        .append("line")
+        .attr("x1", d => xScale(d.date))
+        .attr("x2", d => xScale(d.date))
+        .attr("y1", 0)
+        .attr("y2", height)
+        .style("stroke-width", "2px")
+        .style("stroke", "rgba(0, 0, 0, 0.5)");
+}
+
 let colorScaleApps = d3.scaleOrdinal();
 let colorScaleSM = d3.scaleOrdinal();
 
@@ -244,6 +257,7 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
 
     drawLines(svg, data, apps, xScale, yScale);
 
+    drawEventLines(svg, xScale, h);
 }
 
 function toggleLine(event, colorScale) {
@@ -273,20 +287,28 @@ function toggleLine(event, colorScale) {
     // }
 }
 
+let eventsData = [];
 
+// async function so we can load the events data first before any chart
+(async () => {
+    eventsData = await d3.csv("events.csv", row => ({
+        ...row,
+        date: d3.timeParse("%Y-%m-%d")(row.date),
+    }));
 
-let awarness_chart = createSvg(h, margin, "awareness");
-drawChart("./awareness.csv", awarness_chart, convertDataWithMonth, "Year", "Google Trends Results", "Google Trends for Various Privacy Tools", colorScaleApps);
-let social_media_chart = createSvg(h, margin, "socialmedia")
+    let awarness_chart = createSvg(h, margin, "awareness");
+    drawChart("./awareness.csv", awarness_chart, convertDataWithMonth, "Year", "Google Trends Results", "Google Trends for Various Privacy Tools", colorScaleApps);
+    let social_media_chart = createSvg(h, margin, "socialmedia")
 
-drawChart("./sm_monthly_users.csv", social_media_chart, convertDataWithYear, "Year", "Monthly Users (in Millions)", "Monthly Social Media Users", colorScaleSM);
+    drawChart("./sm_monthly_users.csv", social_media_chart, convertDataWithYear, "Year", "Monthly Users (in Millions)", "Monthly Social Media Users", colorScaleSM);
 
-d3.selectAll("button.app")
-    .on("click", (e) => {
-        toggleLine(e, colorScaleApps);
-    });
+    d3.selectAll("button.app")
+        .on("click", (e) => {
+            toggleLine(e, colorScaleApps);
+        });
 
-d3.selectAll("button.sm")
-    .on("click", (e) => {
-        toggleLine(e, colorScaleSM);
-    });
+    d3.selectAll("button.sm")
+        .on("click", (e) => {
+            toggleLine(e, colorScaleSM);
+        });
+})();
