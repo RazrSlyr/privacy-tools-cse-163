@@ -205,7 +205,21 @@ function drawEventLines(svg, xScale, height) {
         .attr("y1", 0)
         .attr("y2", height)
         .style("stroke-width", "2px")
-        .style("stroke", "rgba(0, 0, 0, 0.5)");
+        .style("stroke", "rgba(0, 0, 0, 0.5)")
+        .on("mouseover", (_, d) => {
+            d3.select("#event-tooltip-name").text(d.name);
+            d3.select("#event-tooltip-date")
+                .text(d.date.toLocaleDateString())
+                .attr("datetime", d.date.toISOString());
+            d3.select("#event-tooltip-description").text(d.description);
+            d3.select("#event-tooltip-source")
+                .text(d.source)
+                .attr("href", d.source);
+            d3.select("#event-tooltip-container").style("display", "block");
+        })
+        .on("mouseout", () => {
+            d3.select("#event-tooltip-container").style("display", "none");
+        });
 }
 
 let colorScaleApps = d3.scaleOrdinal();

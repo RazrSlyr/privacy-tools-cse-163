@@ -36,3 +36,7 @@
 .grid path {
     stroke-width: 0;
 }
+
+#event-tooltip-container {
+    display: none;
+}
