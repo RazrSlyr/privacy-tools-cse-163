@@ -651,7 +651,10 @@ function makeBarChart(chart_data, event_name) {
             updateEventInfoBox(eventsData.find(e => e.name == selectedName));
         })
         .selectAll("option")
-        .data(eventsData)
+        .data([
+            { name: "No Event" },
+            ...eventsData,
+        ])
         .enter()
         .append("option")
         .html((d) => d.name);
