@@ -310,8 +310,9 @@ let colorScaleSM = d3.scaleOrdinal();
 let colorScaleVPN = d3.scaleOrdinal();
 let colorScaleSE = d3.scaleOrdinal();
 
+
 // Combines all the helper functions to draw the completed chart
-async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorScale) {
+async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorScale, hasButtons = true) {
     const data = await d3.csv(file, convertData);
     const apps = getApps(data);
     //width = 1300 - margin.left - margin.right,
@@ -328,10 +329,12 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
 
     // Color all the buttons
     // TODO (ben) possibly have d3 generate these buttons?
-    for (let i = 0; i < apps.length; i++) {
-        console.log(`button.${apps[i].id.split(" ").join("")}`);
-        d3.select(`button.${apps[i].id.split(" ").join("")}`).style("background-color", colorScale(apps[i].id));
-        d3.select(`button.${apps[i].id.split(" ").join("")}`).style("border", `2px solid ${colorScale(apps[i].id)}`);
+    if (hasButtons) {
+        for (let i = 0; i < apps.length; i++) {
+            console.log(`button.${apps[i].id.split(" ").join("")}`);
+            d3.select(`button.${apps[i].id.split(" ").join("")}`).style("background-color", colorScale(apps[i].id));
+            d3.select(`button.${apps[i].id.split(" ").join("")}`).style("border", `2px solid ${colorScale(apps[i].id)}`);
+        }
     }
 
     let w = svg.attr("width");
@@ -604,6 +607,9 @@ function makeBarChart(chart_data, event_name) {
     drawChart("./sm_monthly_users.csv", social_media_chart, convertDataWithYear, "Year", "Monthly Users (in Millions)", "Monthly Social Media Users", colorScaleSM);
     let search_engine_chart = createSvg(h, margin, "searchengines")
     drawChart("./search_engine.csv", search_engine_chart, convertDataWithMonth, "Year", "Market Share (%)", "Market Share of Various Search Engines", colorScaleSE);
+    let vpn_usage_chart = createSvg(h, margin, "vpnusage")
+    drawChart("./vpn_usage.csv", vpn_usage_chart, convertDataWithYear, "Year", "Usage (% of Internet Traffic)", "Usage of VPNs", colorScaleVPN);
+    
 
 
 
@@ -626,11 +632,14 @@ function makeBarChart(chart_data, event_name) {
     const awareness_data = await d3.csv("./awareness.csv", convertDataWithMonth);
     const social_media_data = await d3.csv("./sm_monthly_users.csv", convertDataWithYear);
     const search_engine_data = await d3.csv("./search_engine.csv", convertDataWithMonth);
+    const vpn_usage_data = await d3.csv("./vpn_usage.csv", convertDataWithMonth);
+    
 
 
     const apps_awareness = getApps(awareness_data);
     const apps_sm = getApps(social_media_data);
     const apps_search_engine = getApps(search_engine_data);
+    const apps_vpn_usage = getApps(vpn_usage_data);
 
     // defining the information needed for each bar chart
     barChartData = [
@@ -662,6 +671,15 @@ function makeBarChart(chart_data, event_name) {
             data: search_engine_data,
             color_scale: colorScaleSE
         },
+        // VPN Usage Data
+        {
+            id: "vpnusage-bar",
+            axis_name: "Usage (% of Internet Traffic)",
+            max_y: d3.max(apps_vpn_usage, (c) => d3.max(c.values, (d) => d.stat)),
+            app_names: vpn_usage_data.columns.slice(1),
+            data: vpn_usage_data,
+            color_scale: colorScaleVPN
+        }
     ];
 
     // creating bar chart skeleton
