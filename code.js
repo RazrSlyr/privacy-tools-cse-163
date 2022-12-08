@@ -225,7 +225,7 @@ function drawEventLines(svg, xScale, height, selectedEvent, selection) {
         .attr("x2", d => xScale(d.date))
         .attr("y1", 0)
         .attr("y2", height)
-        .style("stroke-width", d => d.name == selectedEvent ? "2px" : "1px")
+        .style("stroke-width", d => d.name == selectedEvent ? "3px" : "4px")
         .style("stroke", d => d.name == selectedEvent ? "red" : "rgba(0, 0, 0, 0.5)")
         .on("mouseover", (e, d) => {
             d3.select("#event-tooltip")
