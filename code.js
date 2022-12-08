@@ -36,9 +36,9 @@ function drawAxes(svg, xScale, yScale, h) {
     // Creates yAxis
     let yAxis = d3.axisLeft()
         .scale(yScale);
-
+    focus = svg.select(".focus")
     // Draws X Axis
-    svg.append("g")
+    focus.append("g")
         // Note: Adding this class does nothing functionally
         // However, it is useful for organizational purposes
         .attr("class", "x axis")
@@ -46,7 +46,7 @@ function drawAxes(svg, xScale, yScale, h) {
         .attr("transform", "translate(0, " + h + ")"); // moves axis to bottom
 
     // Draws Y Axis
-    svg.append("g")
+    focus.append("g")
         // Note: Adding this class does nothing functionally
         // However, it is useful for organizational purposes
         .attr("class", "y axis")
@@ -98,31 +98,22 @@ function getApps(data) {
 }
 
 // Given the country data, draws all the lines
-function drawLines(svg, data, apps, xScale, yScale) {
+function drawLines(svg, data, apps, xScale, yScale, line, f) {
     let appNames = data.columns.slice(1); // Slice cuts off the time category
     // Creates a "scale" that maps the app names to different colors
     let colorScale = d3.scaleOrdinal()
         .domain(appNames)
         .range(d3.schemeCategory10);
 
-    // let's make a group with a class "app appName" for every country 
-    let app = svg.selectAll(".app")
+
+    let app = svg.select(".focus")
+        .selectAll("why") //Why
         .data(apps)
         .enter()
         .append("g")
         .attr("class", (d) => "app " + d.id);
-    // Note: adding these classes does nothing for functionality
-    // It helps readability, however
 
-    // We need to draw the lines now. However, before we can do that
-    // we need to define the line we will be drawing. We can do this by using
-    // d3.line
-    let line = d3.line()
-        .curve(d3.curveBasis) // curves the line
-        .x((d) => xScale(d.time)) // This sets the x to the time but properly scaled
-        .y((d) => yScale(d.stat)) // This sets the y to the stat being measured but properly scaled
 
-    // using this line, we can add the paths for each country
     app.append("path")
         .attr("class", (d) => "line " + d.id) // unlike other classes, this one actually has attributes. it removes the fill
         .attr("d", (d) => line(d.values)) // sets the x and y using the line function
@@ -141,9 +132,6 @@ function drawLines(svg, data, apps, xScale, yScale) {
     //     .attr("dy", "0.35em")
     //     .attr("fill", (d) => colorScale(d.id))
     //     .text((d) => { return d.id; });
-
-
-
 }
 
 // Draws the Chart Title and Axis Titles
@@ -229,6 +217,65 @@ function drawEventLines(svg, xScale, height) {
         });
 }
 
+function drawContext(svg, data, apps, xScale2, yScale2, context) {
+    let appNames = data.columns.slice(1); // Slice cuts off the time category
+    // Creates a "scale" that maps the app names to different colors
+    let colorScale = d3.scaleOrdinal()
+        .domain(appNames)
+        .range(d3.schemeCategory10);
+
+    var line2 = d3
+        .line()
+        .x(function(d) {
+          return xScale2(d.time);
+        })
+        .y(function(d) {
+          return yScale2(d.stat);
+        })
+        .curve(d3.curveBasis);
+
+    var contextlineGroups = context
+        .selectAll("g")
+        .data(apps)
+        .enter()
+        .append("g");
+  
+      var contextLines = contextlineGroups
+        .append("path")
+        .attr("class", "line")
+        .attr("d", function(d) {
+          return line2(d.values);
+        })
+        .style("stroke", (d) => colorScale(d.id)) // uses the colorScale to give each country its own color
+        .attr("clip-path", "url(#clip)")
+        .style("stroke-width", 1);
+  
+  
+      context
+        .append("g")
+        .attr("class", "x axis2")
+        .attr("transform", "translate(0," + h2 + ")")
+        .call(d3.axisBottom(xScale2));
+
+
+
+    // let app = svg.select(".focus")
+    //     .selectAll("why") //Why
+    //     .data(apps)
+    //     .enter()
+    //     .append("g")
+    //     .attr("class", (d) => "app " + d.id);
+
+
+    // app.append("path")
+    //     .attr("class", (d) => "line " + d.id) // unlike other classes, this one actually has attributes. it removes the fill
+    //     .attr("d", (d) => line(d.values)) // sets the x and y using the line function
+    //     .style("stroke", (d) => colorScale(d.id)) // uses the colorScale to give each country its own color
+    //     .style("stroke-width", 1);
+
+}
+
+
 let colorScaleApps = d3.scaleOrdinal();
 let colorScaleSM = d3.scaleOrdinal();
 
@@ -280,7 +327,6 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     .attr("width", w - margin.left - margin.right)
     .attr("height", h);
   
-
     var line = d3
     .line()
     .x(function(d) {
@@ -290,28 +336,18 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
       return yScale(d.stat);
     })
     .curve(d3.curveBasis);
-
-    var line2 = d3
-    .line()
-    .x(function(d) {
-      return xScale2(d.time);
-    })
-    .y(function(d) {
-      return yScale2(d.stat);
-    })
-    .curve(d3.curveBasis);
   
 //   var focus = svg
 //     .append("g")
 //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  
 //   var context = svg
 //     .append("g")
 //     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
     var focus = svg
     .append("g")
-    .attr("transform", "translate(0, 0)");
+    .attr("transform", "translate(0, 0)")
+    .attr("class", "focus");
 
     var context = svg
     .append("g")
@@ -320,15 +356,9 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     let xScale = d3.scaleTime()
         .domain(xExtents)
         .range([0, w - margin.left - margin.right]);
-
     let yScale = d3.scaleLinear()
         .domain([yMin, yMax])
         .range([h, 0]); // order is reversed to make the bottom smaller than top
-
-    // xScale2 = d3.scaleTime().range([0, w - margin.left - margin.right]);
-    // yScale2 = d3.scaleLinear().range([h2, 0]);
-    // xScale2.domain(xScale.domain());
-    // yScale2.domain(yScale.domain());
 
     var xScale2 = d3.scaleTime()
         .domain(xExtents)
@@ -338,73 +368,22 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
         .domain([yMin, yMax])
         .range([75, 0]); // TODO: Dynamic
 
-    var focuslineGroups = focus
-    .selectAll("g")
-    .data(apps)
-    .enter()
-    .append("g");
-
-    var focuslines = focuslineGroups
-    .append("path")
-    .attr("class", "line")
-    .attr("d", function(d) {
-      return line(d.values);
-    })
-    .style("stroke", (d) => colorScalee(d.id))
-    .style("stroke-width", 1)
-    .attr("clip-path", "url(#clip)");
-
-
-    focus
-      .append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + h + ")")
-      .call(d3.axisBottom(xScale));
-
-    focus
-      .append("g")
-      .attr("class", "y axis")
-      .call(d3.axisLeft(yScale));
-      var contextlineGroups = context
-      .selectAll("g")
-      .data(apps)
-      .enter()
-      .append("g");
-
-    var contextLines = contextlineGroups
-      .append("path")
-      .attr("class", "line")
-      .attr("d", function(d) {
-        return line2(d.values);
-      })
-      .style("stroke", (d) => colorScalee(d.id)) // uses the colorScale to give each country its own color
-      .attr("clip-path", "url(#clip)")
-      .style("stroke-width", 1);
-
-
-    context
-      .append("g")
-      .attr("class", "x axis2")
-      .attr("transform", "translate(0," + h2 + ")")
-      .call(d3.axisBottom(xScale2));
-
-      myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], 75]]).on("start brush end", brushed);
-
-      context
-      .append("g")
-      .attr("class", "x brush")
-      .call(myBrush)
-      .selectAll("rect")
-      .attr("y", -7)
-      .attr("height", h2 + 7);
-
      drawGrid(svg, xScale, yScale, w, h);
-    //drawAxes(svg, xScale, yScale, h);
+     drawAxes(svg, xScale, yScale, h);
      drawTitles(svg, w, h, xlabel, ylabel, title);
 
-    //drawLines(svg, data, apps, xScale, yScale);
+     drawLines(svg, data, apps, xScale, yScale, line, focus);
+     drawContext(svg, data, apps, xScale2, yScale2, context);
+     myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], 75]]).on("start brush end", brushed);
 
-    // drawEventLines(svg, xScale, h);
+     context
+     .append("g")
+     .attr("class", "x brush")
+     .call(myBrush)
+     .selectAll("rect")
+     .attr("y", -7)
+     .attr("height", h2 + 7);
+    //drawEventLines(svg, xScale, h);
 
     function brushed(event) {
         var s = event.selection;
@@ -417,7 +396,6 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
         focus.select(".x.axis").call(d3.axisBottom(xScale));
         focus.select(".y.axis").call(d3.axisLeft(yScale));
       }
-      
 }
 
 function toggleLine(event, colorScale) {
