@@ -190,18 +190,31 @@ function drawGrid(svg, xScale, yScale, w, h) {
 
 }
 
+function updateEventInfoBox(d) {
+    d3.select("#event-info-name").text(d.name);
+    d3.select("#event-info-date")
+        .text(d.date.toDateString() + ".")
+        .attr("datetime", d.date.toISOString());
+    d3.select("#event-info-description").text(d.description);
+    d3.select("#event-info-source")
+        .attr("href", d.source)
+        .text("(source)");
+}
+
 let eventLineArgs = [];
 
-function drawEventLines(svg, xScale, height, selectedEvent) {
+function drawEventLines(svg, xScale, height, selectedEvent, selection) {
     if (eventLineArgs.find(a => a[0] == svg) === undefined) {
         eventLineArgs.push([svg, xScale, height]);
     }
 
     console.log("IN DRAWEVENTLINEES", selectedEvent);
-    svg.selectAll(".event")
-        .data(eventsData)
-        .enter()
-        .append("line")
+    if (selection === undefined) {
+        selection = svg.selectAll(".event")
+            .data(eventsData)
+            .join("line");
+    }
+    selection
         .attr("x1", d => xScale(d.date))
         .attr("x2", d => xScale(d.date))
         .attr("y1", 0)
@@ -209,17 +222,10 @@ function drawEventLines(svg, xScale, height, selectedEvent) {
         .style("stroke-width", d => d.name == selectedEvent ? "2px" : "1px")
         .style("stroke", d => d.name == selectedEvent ? "red" : "rgba(0, 0, 0, 0.5)")
         .on("mouseover", (_, d) => {
-            d3.select("#event-info-name").text(d.name);
-            d3.select("#event-info-date")
-                .text(d.date.toDateString() + ".")
-                .attr("datetime", d.date.toISOString());
-            d3.select("#event-info-description").text(d.description);
-            d3.select("#event-info-source")
-                .attr("href", d.source)
-                .text("(source)");
         })
         .on("mouseout", () => {
         });
+    return selection;
 }
 
 function drawContext(svg, data, apps, xScale2, yScale2, context) {
@@ -635,9 +641,14 @@ function makeBarChart(chart_data, event_name) {
                 makeBarChart(barChartData[i], selectedName);
             }
 
-            for (const a of eventLineArgs) {
-                drawEventLines(...a, selectedName);
+            for (const i in eventLineArgs) {
+                let a = eventLineArgs[i];
+                const args = a[3] ? [a[0], a[1], a[2], selectedName, a[3]] : [...a, selectedName];
+                const selection = drawEventLines(...args);
+                eventLineArgs[i].push(selection);
             }
+
+            updateEventInfoBox(eventsData.find(e => e.name == selectedName));
         })
         .selectAll("option")
         .data(eventsData)
