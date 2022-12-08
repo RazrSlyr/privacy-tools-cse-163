@@ -284,6 +284,7 @@ function drawContext(svg, data, apps, xScale2, yScale2, context) {
 let colorScaleApps = d3.scaleOrdinal();
 let colorScaleSM = d3.scaleOrdinal();
 let colorScaleVPN = d3.scaleOrdinal();
+let colorScaleSE = d3.scaleOrdinal();
 
 // Combines all the helper functions to draw the completed chart
 async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorScale) {
@@ -576,8 +577,11 @@ function makeBarChart(chart_data, event_name) {
     let awarness_chart = createSvg(h, margin, "awareness");
     drawChart("./awareness.csv", awarness_chart, convertDataWithMonth, "Year", "Google Trends Results", "Google Trends for Various Privacy Tools", colorScaleApps);
     let social_media_chart = createSvg(h, margin, "socialmedia")
-
     drawChart("./sm_monthly_users.csv", social_media_chart, convertDataWithYear, "Year", "Monthly Users (in Millions)", "Monthly Social Media Users", colorScaleSM);
+    let search_engine_chart = createSvg(h, margin, "searchengines")
+    drawChart("./search_engine.csv", search_engine_chart, convertDataWithMonth, "Year", "Market Share (%)", "Market Share of Various Search Engines", colorScaleSE);
+
+
 
     d3.selectAll("button.app")
         .on("click", (e) => {
@@ -589,31 +593,52 @@ function makeBarChart(chart_data, event_name) {
             toggleLine(e, colorScaleSM);
         });
 
+    d3.selectAll("button.se")
+        .on("click", (e) => {
+            toggleLine(e, colorScaleSE);
+        });
 
     // Grabbing all the data here for the creation of the bar charts
     const awareness_data = await d3.csv("./awareness.csv", convertDataWithMonth);
     const social_media_data = await d3.csv("./sm_monthly_users.csv", convertDataWithYear);
-    console.log(awareness_data);
+    const search_engine_data = await d3.csv("./search_engine.csv", convertDataWithMonth);
+
+
     const apps_awareness = getApps(awareness_data);
     const apps_sm = getApps(social_media_data);
+    const apps_search_engine = getApps(search_engine_data);
 
     // defining the information needed for each bar chart
-    barChartData = [{
-        id: "awareness-bar",
-        axis_name: "Google Trends Results",
-        max_y: d3.max(apps_awareness, (c) => d3.max(c.values, (d) => d.stat)),
-        app_names: awareness_data.columns.slice(1),
-        data: awareness_data,
-        data_no_convert: awareness_data,
-        color_scale: colorScaleApps
-    }, {
-        id: "socialmedia-bar",
-        axis_name: "Monthly Users (in Millions)",
-        max_y: d3.max(apps_sm, (c) => d3.max(c.values, (d) => d.stat)),
-        app_names: social_media_data.columns.slice(1),
-        data: social_media_data,
-        color_scale: colorScaleSM
-    }];
+    barChartData = [
+        // Awareness Data
+        {
+            id: "awareness-bar",
+            axis_name: "Google Trends Results",
+            max_y: d3.max(apps_awareness, (c) => d3.max(c.values, (d) => d.stat)),
+            app_names: awareness_data.columns.slice(1),
+            data: awareness_data,
+            data_no_convert: awareness_data,
+            color_scale: colorScaleApps
+        },
+        // Social Media Data 
+        {
+            id: "socialmedia-bar",
+            axis_name: "Monthly Users (in Millions)",
+            max_y: d3.max(apps_sm, (c) => d3.max(c.values, (d) => d.stat)),
+            app_names: social_media_data.columns.slice(1),
+            data: social_media_data,
+            color_scale: colorScaleSM
+        },
+        // Search Engine Market Share Data
+        {
+            id: "searchengines-bar",
+            axis_name: "Market Share (%)",
+            max_y: d3.max(apps_search_engine, (c) => d3.max(c.values, (d) => d.stat)),
+            app_names: search_engine_data.columns.slice(1),
+            data: search_engine_data,
+            color_scale: colorScaleSE
+        },
+    ];
 
     // creating bar chart skeleton
     for (let i = 0; i < barChartData.length; i++) {
