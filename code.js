@@ -217,7 +217,7 @@ function drawEventLines(svg, xScale, height, selectedEvent, selection) {
     console.log("IN DRAWEVENTLINEES", selectedEvent);
     if (selection === undefined) {
         selection = svg.selectAll(".event")
-            .data(eventsData)
+            .data(eventsData.filter(d => xScale(d.date) < parseFloat(svg.node().parentNode.getAttribute("width")) - (margin.left + margin.right)))
             .join("line");
     }
     selection
@@ -227,9 +227,21 @@ function drawEventLines(svg, xScale, height, selectedEvent, selection) {
         .attr("y2", height)
         .style("stroke-width", d => d.name == selectedEvent ? "2px" : "1px")
         .style("stroke", d => d.name == selectedEvent ? "red" : "rgba(0, 0, 0, 0.5)")
-        .on("mouseover", (_, d) => {
+        .on("mouseover", (e, d) => {
+            d3.select("#event-tooltip")
+                .style("display", "inline-block")
+                .style("left", e.clientX + window.scrollX + "px")
+                .style("top", e.clientY + window.scrollY + "px")
+                .text(d.name)
+                .on("mouseout", e => {
+                    d3.select(e.target).style("display", "none");
+                })
         })
-        .on("mouseout", () => {
+        .on("mousemove", e => {
+            d3.select("#event-tooltip")
+                .style("left", e.clientX + window.scrollX + "px")
+                .style("top", e.clientY + window.scrollY + "px");
+
         });
     return selection;
 }

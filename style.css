@@ -37,3 +37,14 @@
 .grid path {
     stroke-width: 0;
 }
+
+#event-tooltip {
+    display: none;
+    position: absolute;
+    height: 2em;
+    line-height: 2em;
+    min-width: 2em;
+    padding: 0 0.5em;
+    border: thin solid black;
+    background-color: #ffffffc0;
+}
