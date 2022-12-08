@@ -18,7 +18,7 @@ margin2 = {
 function createSvg(h, margin, id) {
     let w = parseFloat(d3.select(`#${id}`).style("width"));
     let svg = d3.select(`#${id}`)
-        .attr("height", h + margin.top + margin.bottom) //TODO
+        .attr("height", h + margin.top + margin.bottom + 50) //TODO
         .append("g")
         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
         .attr("width", w)
@@ -325,10 +325,18 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
         .domain([yMin, yMax])
         .range([h, 0]); // order is reversed to make the bottom smaller than top
 
-    xScale2 = d3.scaleTime().range([0, w - margin.left - margin.right]);
-    yScale2 = d3.scaleLinear().range([h2, 0]);
-    xScale2.domain(xScale.domain());
-    yScale2.domain(yScale.domain());
+    // xScale2 = d3.scaleTime().range([0, w - margin.left - margin.right]);
+    // yScale2 = d3.scaleLinear().range([h2, 0]);
+    // xScale2.domain(xScale.domain());
+    // yScale2.domain(yScale.domain());
+
+    var xScale2 = d3.scaleTime()
+        .domain(xExtents)
+        .range([0, w - margin.left - margin.right]);
+
+    var yScale2 = d3.scaleLinear()
+        .domain([yMin, yMax])
+        .range([75, 0]); // TODO: Dynamic
 
     var focuslineGroups = focus
     .selectAll("g")
@@ -380,7 +388,7 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
       .attr("transform", "translate(0," + h2 + ")")
       .call(d3.axisBottom(xScale2));
 
-      myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], h2]]).on("start brush end", brushed);
+      myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], 75]]).on("start brush end", brushed);
 
       context
       .append("g")
@@ -390,9 +398,9 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
       .attr("y", -7)
       .attr("height", h2 + 7);
 
-    // drawGrid(svg, xScale, yScale, w, h);
+     drawGrid(svg, xScale, yScale, w, h);
     //drawAxes(svg, xScale, yScale, h);
-    // drawTitles(svg, w, h, xlabel, ylabel, title);
+     drawTitles(svg, w, h, xlabel, ylabel, title);
 
     //drawLines(svg, data, apps, xScale, yScale);
 
