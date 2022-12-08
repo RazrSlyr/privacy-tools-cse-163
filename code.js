@@ -225,11 +225,11 @@ function drawContext(svg, data, apps, xScale2, yScale2, context) {
 
     var line2 = d3
         .line()
-        .x(function(d) {
-          return xScale2(d.time);
+        .x(function (d) {
+            return xScale2(d.time);
         })
-        .y(function(d) {
-          return yScale2(d.stat);
+        .y(function (d) {
+            return yScale2(d.stat);
         })
         .curve(d3.curveBasis);
 
@@ -238,19 +238,19 @@ function drawContext(svg, data, apps, xScale2, yScale2, context) {
         .data(apps)
         .enter()
         .append("g");
-  
-      var contextLines = contextlineGroups
+
+    var contextLines = contextlineGroups
         .append("path")
         .attr("class", "line")
-        .attr("d", function(d) {
-          return line2(d.values);
+        .attr("d", function (d) {
+            return line2(d.values);
         })
         .style("stroke", (d) => colorScale(d.id)) // uses the colorScale to give each country its own color
         .attr("clip-path", "url(#clip)")
         .style("stroke-width", 1);
-  
-  
-      context
+
+
+    context
         .append("g")
         .attr("class", "x axis2")
         .attr("transform", "translate(0," + h2 + ")")
@@ -277,6 +277,7 @@ function drawContext(svg, data, apps, xScale2, yScale2, context) {
 
 let colorScaleApps = d3.scaleOrdinal();
 let colorScaleSM = d3.scaleOrdinal();
+let colorScaleVPN = d3.scaleOrdinal();
 
 // Combines all the helper functions to draw the completed chart
 async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorScale) {
@@ -291,8 +292,8 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     colorScale.domain(appNames).range(d3.schemeCategory10);
 
     let colorScalee = d3.scaleOrdinal()
-    .domain(appNames)
-    .range(d3.schemeCategory10);
+        .domain(appNames)
+        .range(d3.schemeCategory10);
 
     // Color all the buttons
     // TODO (ben) possibly have d3 generate these buttons?
@@ -309,7 +310,7 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     // // Get's the lowest and highest year. Will be used for xScale
     let xExtents = d3.extent(data, (d) => d.time);
 
-    // // Get's the lowest and highest energy consumption. Will be used for yScale
+    // // Get's the lowest and highest values. Will be used for yScale
     // // This is done through two layers of iteration, first getting the min/max
     // // of each app then getting the min/max of all the mins and maxes
     let yMin = d3.min(apps, (c) => d3.min(c.values, (d) => d.stat));
@@ -319,38 +320,38 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     console.log(apps);
 
     svg
-    .append("defs")
-    .append("clipPath")
-    .attr("id", "clip")
-    .append("rect")
-    .attr("width", w - margin.left - margin.right)
-    .attr("height", h);
-  
+        .append("defs")
+        .append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", w - margin.left - margin.right)
+        .attr("height", h);
+
     var line = d3
-    .line()
-    .x(function(d) {
-      return xScale(d.time);
-    })
-    .y(function(d) {
-      return yScale(d.stat);
-    })
-    .curve(d3.curveBasis);
-  
-//   var focus = svg
-//     .append("g")
-//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-//   var context = svg
-//     .append("g")
-//     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+        .line()
+        .x(function (d) {
+            return xScale(d.time);
+        })
+        .y(function (d) {
+            return yScale(d.stat);
+        })
+        .curve(d3.curveBasis);
+
+    //   var focus = svg
+    //     .append("g")
+    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    //   var context = svg
+    //     .append("g")
+    //     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
     var focus = svg
-    .append("g")
-    .attr("transform", "translate(0, 0)")
-    .attr("class", "focus");
+        .append("g")
+        .attr("transform", "translate(0, 0)")
+        .attr("class", "focus");
 
     var context = svg
-    .append("g")
-    .attr("transform", "translate(0, 400)");
+        .append("g")
+        .attr("transform", "translate(0, 400)");
 
     let xScale = d3.scaleTime()
         .domain(xExtents)
@@ -367,34 +368,34 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
         .domain([yMin, yMax])
         .range([75, 0]); // TODO: Dynamic
 
-     drawGrid(svg, xScale, yScale, w, h);
-     drawAxes(svg, xScale, yScale, h);
-     drawTitles(svg, w, h, xlabel, ylabel, title);
+    drawGrid(svg, xScale, yScale, w, h);
+    drawAxes(svg, xScale, yScale, h);
+    drawTitles(svg, w, h, xlabel, ylabel, title);
 
-     drawLines(svg, data, apps, xScale, yScale, line, focus);
-     drawContext(svg, data, apps, xScale2, yScale2, context);
-     myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], 75]]).on("start brush end", brushed);
+    drawLines(svg, data, apps, xScale, yScale, line, focus);
+    drawContext(svg, data, apps, xScale2, yScale2, context);
+    myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], 75]]).on("start brush end", brushed);
 
-     context
-     .append("g")
-     .attr("class", "x brush")
-     .call(myBrush)
-     .selectAll("rect")
-     .attr("y", -7)
-     .attr("height", h2 + 7);
+    context
+        .append("g")
+        .attr("class", "x brush")
+        .call(myBrush)
+        .selectAll("rect")
+        .attr("y", -7)
+        .attr("height", h2 + 7);
     //drawEventLines(svg, xScale, h);
 
     function brushed(event) {
         var s = event.selection;
-        
+
         xScale.domain(event.selection === null ? xScale2.domain() : [xScale2.invert(s[0]), xScale2.invert(s[1])]);
-        
-        focus.selectAll("path.line").attr("d", function(d) {
-          return line(d.values);
+
+        focus.selectAll("path.line").attr("d", function (d) {
+            return line(d.values);
         });
         focus.select(".x.axis").call(d3.axisBottom(xScale));
         focus.select(".y.axis").call(d3.axisLeft(yScale));
-      }
+    }
 }
 
 function toggleLine(event, colorScale) {
@@ -425,6 +426,133 @@ function toggleLine(event, colorScale) {
 }
 
 let eventsData = [];
+let barScales = [];
+let barChartData = []
+
+function makeBarChart(chart_data, event_name) {
+    let svg_w = parseFloat(d3.select(`#${chart_data.id}`).style("width"));
+    let svg_h = parseFloat(d3.select(`#${chart_data.id}`).style("height"));
+
+    let width = svg_w - 400;
+    let height = svg_h - 150;
+
+    // define scales
+    var xScale = d3.scaleBand()
+        .domain(chart_data.app_names)
+        .rangeRound([0, width])
+        .padding(0.1);
+    var yScale = d3.scaleLinear()
+        .domain([0, chart_data.max_y])
+        .range([height, 0]);
+
+    console.log(chart_data.max_y);
+
+    var xAxis = d3.axisBottom(xScale);
+    var yAxis = d3.axisLeft(yScale).ticks(5);
+
+
+    // create chart
+    let chart = d3.select(`#${chart_data.id}`)
+        .append("g")
+        .attr("transform", `translate(${200}, ${75})`)
+        .style("width", width)
+        .style("height", height)
+
+
+    // draw y-axis
+    chart.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .selectAll("text")
+        .attr("dy", "-.5em")
+        .style("text-anchor", "end")
+        .attr("fill", "black")
+        .attr("font-size", "15px");
+
+    // draw x-axis
+    chart.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .attr("dx", "0.75em")
+        .attr("dy", "1.25em")
+        .style("text-anchor", "end")
+        .attr("font-size", "15px")
+        .style("transform", "rotate(-15deg)");
+
+    // adds y-axis text
+    chart.append("text")
+        .text(chart_data.axis_name)
+        .style("transform", "rotate(-90deg)")
+        .attr("y", "-3.5em")
+        .attr("x", "-14.5em")
+        .attr("font-size", "15px")
+
+
+    let yGridLines = d3.axisRight()
+        .scale(yScale)
+        .ticks("5") // sets number of ticks to 5
+        .tickFormat("") // removes text from ticks
+        .tickSize(width); // makes each tick cover all the horizontal space
+
+
+    // add y gridlines
+    chart.append("g")
+        .attr("class", "grid") // this allows us to apply some css to make it look like a background grid
+        .call(yGridLines);
+
+    // If there is no event, this is sufficient
+    if (event_name == "No Event") {
+        return;
+    }
+
+    let event = null;
+    for (let i = 0; i < eventsData.length; i++) {
+        if (eventsData[i].name == event_name) {
+            event = eventsData[i];
+            break;
+        }
+    }
+
+    // create bisector to get the necessary data
+    let bisector = d3.bisector((d) => d.time).center;
+    let index = bisector(chart_data.data, event.date);
+    let data = chart_data.data[index]
+    // delete the time data, we don't need it anymore
+    let deleteFirst = true;
+    for (let i = 0; i < chart_data.app_names.length; i++) {
+        // First column is already deleted?
+        console.log(`Comparing ${chart_data.app_names[i]} to ${Object.keys(data)[0]}`);
+        if (chart_data.app_names[i] == Object.keys(data)[0]) {
+            // true
+            deleteFirst = false;
+            break;
+        }
+    }
+    if (deleteFirst) {
+        delete data[Object.keys(data)[0]];
+    }
+
+    // if the time column is still there, delete it
+    if (Object.keys(data)[Object.keys(data).length - 1] == "time") {
+        delete data[Object.keys(data)[Object.keys(data).length - 1]];
+    }
+
+
+    // now we have the neccessary data and we can plot the bars
+    for (let i = 0; i < Object.keys(data).length; i++) {
+        let name = Object.keys(data)[i];
+        chart.append("rect")
+            .attr("x", xScale(name))
+            .attr("y", yScale(data[name]))
+            .attr("width", xScale.bandwidth())
+            .attr("height", height - yScale(data[name]))
+            .attr("fill", chart_data.color_scale(name));
+    }
+
+
+}
 
 // async function so we can load the events data first before any chart
 (async () => {
@@ -432,6 +560,12 @@ let eventsData = [];
         ...row,
         date: d3.timeParse("%Y-%m-%d")(row.date),
     }));
+
+
+
+
+
+
 
     let awarness_chart = createSvg(h, margin, "awareness");
     drawChart("./awareness.csv", awarness_chart, convertDataWithMonth, "Year", "Google Trends Results", "Google Trends for Various Privacy Tools", colorScaleApps);
@@ -448,4 +582,69 @@ let eventsData = [];
         .on("click", (e) => {
             toggleLine(e, colorScaleSM);
         });
+
+
+    // Grabbing all the data here for the creation of the bar charts
+    const awareness_data = await d3.csv("./awareness.csv", convertDataWithMonth);
+    const social_media_data = await d3.csv("./sm_monthly_users.csv", convertDataWithYear);
+    console.log(awareness_data);
+    const apps_awareness = getApps(awareness_data);
+    const apps_sm = getApps(social_media_data);
+
+    // defining the information needed for each bar chart
+    barChartData = [{
+        id: "awareness-bar",
+        axis_name: "Google Trends Results",
+        max_y: d3.max(apps_awareness, (c) => d3.max(c.values, (d) => d.stat)),
+        app_names: awareness_data.columns.slice(1),
+        data: awareness_data,
+        data_no_convert: awareness_data,
+        color_scale: colorScaleApps
+    }, {
+        id: "socialmedia-bar",
+        axis_name: "Monthly Users (in Millions)",
+        max_y: d3.max(apps_sm, (c) => d3.max(c.values, (d) => d.stat)),
+        app_names: social_media_data.columns.slice(1),
+        data: social_media_data,
+        color_scale: colorScaleSM
+    }];
+
+    // creating bar chart skeleton
+    for (let i = 0; i < barChartData.length; i++) {
+        let chartData = barChartData[i];
+        makeBarChart(chartData, "No Event");
+    }
+
+    // Generate dropdown that lets you select event
+    d3.select("#event-selector")
+        .on("change", (d) => {
+            let selected = d3.select("#event-selector").property("selectedOptions")[0];
+            let selectedName = d3.select(selected).html();
+            // delete all current charts
+            for (let i = 0; i < barChartData.length; i++) {
+                console.log(barChartData[i].id);
+                d3.select(`#${barChartData[i].id}`)
+                    .select("g")
+                    .remove();
+                makeBarChart(barChartData[i], selectedName);
+            }
+        })
+        .selectAll("option")
+        .data(eventsData)
+        .enter()
+        .append("option")
+        .html((d) => d.name);
+
+
+
+
+    // Grabbing date-time for event
+    // For test, will use first event
+    // let bisectDate = d3.bisector(function (d) { return d.time; }).center;
+    // console.log(awareness_data);
+    // let index = bisectDate(awareness_data, eventDate);
+    // console.log(awareness_data[index]);
+
 })();
+
+
