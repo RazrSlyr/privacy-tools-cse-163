@@ -2,6 +2,7 @@
 
 .line {
     fill: none;
+    clip-path: url(#clip);
 }
 
 .title {

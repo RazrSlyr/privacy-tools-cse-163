@@ -1,3 +1,4 @@
+var myBrush;
 let h = 400;
 margin = {
     left: 75,
@@ -5,17 +6,23 @@ margin = {
     top: 75,
     bottom: 75
 };
+margin2 = {
+    left: 75,
+    right: 200,
+    top: 400,
+    bottom: 20
+};
 
 // Creates the SVG everything will be drawn on
 // provided a width, height, and margins
 function createSvg(h, margin, id) {
     let w = parseFloat(d3.select(`#${id}`).style("width"));
     let svg = d3.select(`#${id}`)
-        .attr("height", h + margin.top + margin.bottom)
+        .attr("height", h + margin.top + margin.bottom) //TODO
         .append("g")
         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")")
         .attr("width", w)
-        .attr("height", h);
+
     return svg;
 }
 
@@ -229,10 +236,17 @@ let colorScaleSM = d3.scaleOrdinal();
 async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorScale) {
     const data = await d3.csv(file, convertData);
     const apps = getApps(data);
+    //width = 1300 - margin.left - margin.right,
+    //height = 500 - margin.top - margin.bottom,
+    h2 = 100;
 
     // define color scale
     let appNames = data.columns.slice(1);
     colorScale.domain(appNames).range(d3.schemeCategory10);
+
+    let colorScalee = d3.scaleOrdinal()
+    .domain(appNames)
+    .range(d3.schemeCategory10);
 
     // Color all the buttons
     // TODO (ben) possibly have d3 generate these buttons?
@@ -245,6 +259,7 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     let w = svg.attr("width");
     console.log(w);
 
+
     // // Get's the lowest and highest year. Will be used for xScale
     let xExtents = d3.extent(data, (d) => d.time);
 
@@ -255,7 +270,52 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
     let yMax = d3.max(apps, (c) => d3.max(c.values, (d) => d.stat));
     console.log(yMin);
     console.log(yMax);
+    console.log(apps);
 
+    svg
+    .append("defs")
+    .append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", w - margin.left - margin.right)
+    .attr("height", h);
+  
+
+    var line = d3
+    .line()
+    .x(function(d) {
+      return xScale(d.time);
+    })
+    .y(function(d) {
+      return yScale(d.stat);
+    })
+    .curve(d3.curveBasis);
+
+    var line2 = d3
+    .line()
+    .x(function(d) {
+      return xScale2(d.time);
+    })
+    .y(function(d) {
+      return yScale2(d.stat);
+    })
+    .curve(d3.curveBasis);
+  
+//   var focus = svg
+//     .append("g")
+//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
+//   var context = svg
+//     .append("g")
+//     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+    var focus = svg
+    .append("g")
+    .attr("transform", "translate(0, 0)");
+
+    var context = svg
+    .append("g")
+    .attr("transform", "translate(0, 400)");
 
     let xScale = d3.scaleTime()
         .domain(xExtents)
@@ -265,13 +325,91 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
         .domain([yMin, yMax])
         .range([h, 0]); // order is reversed to make the bottom smaller than top
 
-    drawGrid(svg, xScale, yScale, w, h);
-    drawAxes(svg, xScale, yScale, h);
-    drawTitles(svg, w, h, xlabel, ylabel, title);
+    xScale2 = d3.scaleTime().range([0, w - margin.left - margin.right]);
+    yScale2 = d3.scaleLinear().range([h2, 0]);
+    xScale2.domain(xScale.domain());
+    yScale2.domain(yScale.domain());
 
-    drawLines(svg, data, apps, xScale, yScale);
+    var focuslineGroups = focus
+    .selectAll("g")
+    .data(apps)
+    .enter()
+    .append("g");
 
-    drawEventLines(svg, xScale, h);
+    var focuslines = focuslineGroups
+    .append("path")
+    .attr("class", "line")
+    .attr("d", function(d) {
+      return line(d.values);
+    })
+    .style("stroke", (d) => colorScalee(d.id))
+    .style("stroke-width", 1)
+    .attr("clip-path", "url(#clip)");
+
+
+    focus
+      .append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + h + ")")
+      .call(d3.axisBottom(xScale));
+
+    focus
+      .append("g")
+      .attr("class", "y axis")
+      .call(d3.axisLeft(yScale));
+      var contextlineGroups = context
+      .selectAll("g")
+      .data(apps)
+      .enter()
+      .append("g");
+
+    var contextLines = contextlineGroups
+      .append("path")
+      .attr("class", "line")
+      .attr("d", function(d) {
+        return line2(d.values);
+      })
+      .style("stroke", (d) => colorScalee(d.id)) // uses the colorScale to give each country its own color
+      .attr("clip-path", "url(#clip)")
+      .style("stroke-width", 1);
+
+
+    context
+      .append("g")
+      .attr("class", "x axis2")
+      .attr("transform", "translate(0," + h2 + ")")
+      .call(d3.axisBottom(xScale2));
+
+      myBrush = d3.brushX().extent([[xScale.range()[0], 0], [xScale.range()[1], h2]]).on("start brush end", brushed);
+
+      context
+      .append("g")
+      .attr("class", "x brush")
+      .call(myBrush)
+      .selectAll("rect")
+      .attr("y", -7)
+      .attr("height", h2 + 7);
+
+    // drawGrid(svg, xScale, yScale, w, h);
+    //drawAxes(svg, xScale, yScale, h);
+    // drawTitles(svg, w, h, xlabel, ylabel, title);
+
+    //drawLines(svg, data, apps, xScale, yScale);
+
+    // drawEventLines(svg, xScale, h);
+
+    function brushed(event) {
+        var s = event.selection;
+        
+        xScale.domain(event.selection === null ? xScale2.domain() : [xScale2.invert(s[0]), xScale2.invert(s[1])]);
+        
+        focus.selectAll("path.line").attr("d", function(d) {
+          return line(d.values);
+        });
+        focus.select(".x.axis").call(d3.axisBottom(xScale));
+        focus.select(".y.axis").call(d3.axisLeft(yScale));
+      }
+      
 }
 
 function toggleLine(event, colorScale) {
