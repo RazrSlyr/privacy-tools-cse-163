@@ -191,14 +191,20 @@ function drawGrid(svg, xScale, yScale, w, h) {
 }
 
 function updateEventInfoBox(d) {
-    d3.select("#event-info-name").text(d.name);
-    d3.select("#event-info-date")
-        .text(d.date.toDateString() + ".")
-        .attr("datetime", d.date.toISOString());
-    d3.select("#event-info-description").text(d.description);
-    d3.select("#event-info-source")
-        .attr("href", d.source)
-        .text("(source)");
+    if (d) {
+        d3.select("#event-info-name").text(d.name);
+        d3.select("#event-info-date")
+            .text(d.date.toDateString() + ".")
+            .attr("datetime", d.date.toISOString());
+        d3.select("#event-info-description").text(d.description);
+        d3.select("#event-info-source")
+            .attr("href", d.source)
+            .text("(source)");
+    } else {
+        d3.select("#event-info-date").text("").attr("datetime", null);
+        d3.select("#event-info-description").text("Select an event above to view more details");
+        d3.select("#event-info-source").attr("href", null).text("");
+    }
 }
 
 let eventLineArgs = [];
@@ -515,7 +521,7 @@ function makeBarChart(chart_data, event_name) {
         .call(yGridLines);
 
     // If there is no event, this is sufficient
-    if (event_name == "No Event") {
+    if (event_name.trim() == "No Event") {
         return;
     }
 
