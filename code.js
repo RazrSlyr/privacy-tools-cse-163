@@ -208,7 +208,6 @@ function drawEventLines(svg, xScale, height) {
                 .attr("datetime", d.date.toISOString());
             d3.select("#event-tooltip-description").text(d.description);
             d3.select("#event-tooltip-source")
-                .text(d.source)
                 .attr("href", d.source);
             d3.select("#event-tooltip-container").style("display", "block");
         })

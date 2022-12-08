@@ -7,49 +7,49 @@
     <!-- Read up on it here if you'd like: https://tailwindcss.com/ -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" type="text/css" href="./style.css">
+    <title>Growth of Privacy Tools</title>
 </head>
 
 <body>
     <div class="p-5 text-center text-5xl">
         Growth of Privacy Tools
     </div>
-    <div class="grid grid-cols-2 gap-2 p-5">
-        <div class="grid w-full grid-cols-1 gap-1">
+    <div class="grid grid-cols-5 gap-2 p-5">
+        <div class="grid w-full col-span-3 grid-cols-1 gap-1">
             <svg id="awareness" class="w-full">
-
             </svg>
+            <p>
+                Google Trends measures relative interest in certain terms using the worldwide number
+                of searches for those terms. A score of 100 corresponds to the highest interest
+                level that any of these terms achieved over the time period. A score of 50 means
+                half of that interest level.
+            </p>
+        </div>
+        <div class="col-span-2">
             <div>
-                <button class="app w-5 h-5 rounded-full transition-colors duration-300 tor" active="True"></button>
-                <label>Tor</label><br>
+                <button class="app w-5 h-5 rounded-full transition-colors duration-300 vpn" active="True"></button>
+                <label>VPN</label><br>
                 <button class="app w-5 h-5 rounded-full transition-colors duration-300 duckduckgo"
                     active="True"></button>
                 <label>DuckDuckGo</label><br>
+                <button class="app w-5 h-5 rounded-full transition-colors duration-300 tor" active="True"></button>
+                <label>Tor</label><br>
                 <button class="app w-5 h-5 rounded-full transition-colors duration-300 bravebrowser" active="True"></button>
                 <label>Brave Browser</label><br>
-                <button class="app w-5 h-5 rounded-full transition-colors duration-300 vpn" active="True"></button>
-                <label>VPN</label><br>
                 <button class="app w-5 h-5 rounded-full transition-colors duration-300 startpage"
                     active="True"></button>
                 <label>Startpage</label><br>
             </div>
-
-            <div id="event-tooltip-container">
-                <h1 id="event-tooltip-name">Snowden leaks</h1>
-                <time datetime="" id="event-tooltip-date">foo</time>
-                <p id="event-tooltip-description">
-                    blah blah blah
-                </p>
-                <p>
-                    Source: <a href="" id="event-tooltip-source"></a>
-                </p>
-            </div>
+            <svg id="awareness-bar" style="background-color: lightblue;" class="w-full"></svg>
         </div>
     </div>
-    <div class="grid grid-cols-2 gap-2 p-5">
-        <div class="grid w-full grid-cols-1 gap-1">
+    <div class="grid grid-cols-5 gap-2 p-5">
+        <div class="grid w-full grid-cols-1 gap-1 col-span-3">
             <svg id="socialmedia" class="w-full">
 
             </svg>
+        </div>
+        <div class="col-span-2">
             <div>
                 <button class="sm w-5 h-5 rounded-full transition-colors duration-300 Facebook" active="True"></button>
                 <label>Facebook</label><br>
@@ -60,6 +60,7 @@
                 <button class="sm w-5 h-5 rounded-full transition-colors duration-300 Youtube" active="True"></button>
                 <label>YouTube</label><br>
             </div>
+            <svg id="socialmedia-bar" class="w-full" style="background-color: lightblue;"></svg>
         </div>
     </div>
     <div class="w-full bg-blue-100 p-10 text-center">
@@ -86,7 +87,14 @@
                     </li>
                     <li><a class="text-blue-600" href="https://ourworldindata.org/rise-of-social-media">Social Media Usage Data</a>
                     </li>
-                    
+                    <li><a class="text-blue-600" href="https://gs.statcounter.com/search-engine-market-share/desktop/worldwide/#monthly-200901-202212">Search Engine Market Share</a>
+                    </li>
+                    <li><a class="text-blue-600" href="https://www.geosurf.com/blog/vpn-usage-statistics/">VPN Market Share</a>
+                    </li>
+                    <li><a class="text-blue-600" href="https://www.pcmatic.com/">VPN Usage Data</a>
+                    </li>
+                    <li><a class="text-blue-600" href="https://www.pcmatic.com/news/vpn_report/">VPN Usage Report</a>
+                    </li>
                 </ul>
             </div>
             <div>
@@ -107,6 +115,15 @@
             </div>
 
         </div>
+    </div>
+    <div id="event-tooltip-container">
+        <h1 id="event-tooltip-name" class="text-lg font-bold"></h1>
+        <time datetime="" id="event-tooltip-date" class="text-sm text-neutral-600"></time>
+        <p id="event-tooltip-description">
+        </p>
+        <p>
+            <a href="" id="event-tooltip-source" target="_blank" class="text-blue-600">Source</a>
+        </p>
     </div>
     <script src="./code.js"></script>
 </body>
