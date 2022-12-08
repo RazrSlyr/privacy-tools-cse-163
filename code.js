@@ -445,7 +445,7 @@ function makeBarChart(chart_data, event_name) {
     let svg_w = parseFloat(d3.select(`#${chart_data.id}`).style("width"));
     let svg_h = parseFloat(d3.select(`#${chart_data.id}`).style("height"));
 
-    let width = svg_w - 400;
+    let width = svg_w - 150;
     let height = svg_h - 150;
 
     // define scales
@@ -466,7 +466,7 @@ function makeBarChart(chart_data, event_name) {
     // create chart
     let chart = d3.select(`#${chart_data.id}`)
         .append("g")
-        .attr("transform", `translate(${200}, ${75})`)
+        .attr("transform", `translate(${75}, ${75})`)
         .style("width", width)
         .style("height", height)
 
@@ -667,5 +667,3 @@ function makeBarChart(chart_data, event_name) {
     // console.log(awareness_data[index]);
 
 })();
-
-
