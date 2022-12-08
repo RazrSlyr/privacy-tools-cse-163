@@ -37,10 +37,3 @@
 .grid path {
     stroke-width: 0;
 }
-
-#event-tooltip-container {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 0;
-}

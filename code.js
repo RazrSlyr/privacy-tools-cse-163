@@ -190,7 +190,14 @@ function drawGrid(svg, xScale, yScale, w, h) {
 
 }
 
-function drawEventLines(svg, xScale, height) {
+let eventLineArgs = [];
+
+function drawEventLines(svg, xScale, height, selectedEvent) {
+    if (eventLineArgs.find(a => a[0] == svg) === undefined) {
+        eventLineArgs.push([svg, xScale, height]);
+    }
+
+    console.log("IN DRAWEVENTLINEES", selectedEvent);
     svg.selectAll(".event")
         .data(eventsData)
         .enter()
@@ -199,20 +206,19 @@ function drawEventLines(svg, xScale, height) {
         .attr("x2", d => xScale(d.date))
         .attr("y1", 0)
         .attr("y2", height)
-        .style("stroke-width", "2px")
-        .style("stroke", "rgba(0, 0, 0, 0.5)")
+        .style("stroke-width", d => d.name == selectedEvent ? "2px" : "1px")
+        .style("stroke", d => d.name == selectedEvent ? "red" : "rgba(0, 0, 0, 0.5)")
         .on("mouseover", (_, d) => {
-            d3.select("#event-tooltip-name").text(d.name);
-            d3.select("#event-tooltip-date")
-                .text(d.date.toLocaleDateString())
+            d3.select("#event-info-name").text(d.name);
+            d3.select("#event-info-date")
+                .text(d.date.toDateString() + ".")
                 .attr("datetime", d.date.toISOString());
-            d3.select("#event-tooltip-description").text(d.description);
-            d3.select("#event-tooltip-source")
-                .attr("href", d.source);
-            d3.select("#event-tooltip-container").style("display", "block");
+            d3.select("#event-info-description").text(d.description);
+            d3.select("#event-info-source")
+                .attr("href", d.source)
+                .text("(source)");
         })
         .on("mouseout", () => {
-            d3.select("#event-tooltip-container").style("display", "none");
         });
 }
 
@@ -383,7 +389,7 @@ async function drawChart(file, svg, convertData, xlabel, ylabel, title, colorSca
         .selectAll("rect")
         .attr("y", -7)
         .attr("height", h2 + 7);
-    //drawEventLines(svg, xScale, h);
+    drawEventLines(context, xScale2, 75);
 
     function brushed(event) {
         var s = event.selection;
@@ -627,6 +633,10 @@ function makeBarChart(chart_data, event_name) {
                     .select("g")
                     .remove();
                 makeBarChart(barChartData[i], selectedName);
+            }
+
+            for (const a of eventLineArgs) {
+                drawEventLines(...a, selectedName);
             }
         })
         .selectAll("option")

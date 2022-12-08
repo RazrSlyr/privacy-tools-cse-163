@@ -18,9 +18,9 @@
         The last few decades have been a crucial time period for consumer privacy. As the internet and technology
         expanded our ability to connect
         with others, so did it expand the ability for third parties to breach our privacy. Recent events have helped
-        bring to light the privacy explotations
-        commited by companies and government entities. However, these events only matter if they effect consumer
-        behaviour, which is the key question here.
+        bring to light the privacy explatations
+        committed by companies and government entities. However, these events only matter if they affect consumer
+        behavior, which is the key question here.
 
     </div>
     <div class="text-center p-5">
@@ -36,6 +36,13 @@
             </option>
         </select>
 
+        <div id="event-info-container" class="text-center text-lg h-32">
+            <span class="w-96 inline-block">
+                <time datetime="" id="event-info-date" class="text-neutral-600"></time>
+                <span id="event-info-description"></span>
+                <a href="" id="event-info-source" target="_blank" class="text-blue-600 text-base"></a>
+            </span>
+        </div>
     </div>
     <div class="grid grid-cols-5 gap-2 p-5">
         <div class="grid w-full col-span-3 grid-cols-1 gap-1">
@@ -152,15 +159,6 @@
             </div>
 
         </div>
-    </div>
-    <div id="event-tooltip-container">
-        <h1 id="event-tooltip-name" class="text-lg font-bold"></h1>
-        <time datetime="" id="event-tooltip-date" class="text-sm text-neutral-600"></time>
-        <p id="event-tooltip-description">
-        </p>
-        <p>
-            <a href="" id="event-tooltip-source" target="_blank" class="text-blue-600">Source</a>
-        </p>
     </div>
     <script src="./code.js"></script>
 </body>
